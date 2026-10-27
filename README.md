@@ -3,10 +3,10 @@
 Guía técnica y de despliegue para la implementación estricta de una **Arquitectura Lambda** gobernada para el monitoreo de pacientes en UCI, utilizando **Apache Kafka (KRaft)**, **MinIO (Master Dataset Append-Only)**, **Apache Spark**, **Apache Airflow**, **PostgreSQL (Serving)**, **FastAPI (WebSockets + REST)** y **Frontend Cero Mocks**.
 
 > 📖 **Documentación Especializada:**
-> * [ADRS.md](file:///c:/Users/LENOVO/Documents/DANI%20DOCS/LAMBDA_ARCH/ADRS.md) - Registro formal de decisiones de arquitectura (ADRs 001 al 007).
-> * [RULES.md](file:///c:/Users/LENOVO/Documents/DANI%20DOCS/LAMBDA_ARCH/RULES.md) - Reglas inmutables de arquitectura, código, gobernanza e infraestructura.
-> * [DATA_LINEAGE.md](file:///c:/Users/LENOVO/Documents/DANI%20DOCS/LAMBDA_ARCH/DATA_LINEAGE.md) - Mapa detallado de trazabilidad, contratos de interfaces y ciclo de vida de punta a punta.
-> * [BUSINESS_LOGIC.md](file:///c:/Users/LENOVO/Documents/DANI%20DOCS/LAMBDA_ARCH/BUSINESS_LOGIC.md) - Especificación del dominio clínico UCI, reglas fisiológicas, umbrales de alerta y validación de hardware.
+> * [ADRS.md](file:///c:/Users/LENOVO/Documents/DANI%20DOCS/LAMBDA_ARCH/docs/ADRs/ADRS.md) - Registro formal de decisiones de arquitectura (ADRs 001 al 007).
+> * [RULES.md](file:///c:/Users/LENOVO/Documents/DANI%20DOCS/LAMBDA_ARCH/docs/RULES.md) - Reglas inmutables de arquitectura, código, gobernanza e infraestructura.
+> * [DATA_LINEAGE.md](file:///c:/Users/LENOVO/Documents/DANI%20DOCS/LAMBDA_ARCH/docs/DATA_LINEAGE.md) - Mapa detallado de trazabilidad, contratos de interfaces y ciclo de vida de punta a punta.
+> * [BUSINESS_LOGIC.md](file:///c:/Users/LENOVO/Documents/DANI%20DOCS/LAMBDA_ARCH/docs/BUSINESS_LOGIC.md) - Especificación del dominio clínico UCI, reglas fisiológicas, umbrales de alerta y validación de hardware.
 
 ---
 
