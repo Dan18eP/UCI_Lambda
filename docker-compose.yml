@@ -98,41 +98,17 @@ services:
   # Cumple ADR-002: Master Dataset Append-Only crudo. CERO patrón Medallón.
   # ============================================================================
   minio:
-    image: minio/minio:RELEASE.2023-09-04T19-57-37Z
+    image: bitnamilegacy/minio:latest
     container_name: minio
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
-    command: server /data --console-address ":9001"
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+      - MINIO_DEFAULT_BUCKETS=data-lake
     volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - uci_network
-
-  minio-init-bucket:
-    image: minio/mc:latest
-    container_name: minio-init-bucket
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      until /usr/bin/mc alias set local http://minio:9000 minioadmin minioadmin; do
-        echo 'Esperando arranque de MinIO...';
-        sleep 2;
-      done;
-      /usr/bin/mc mb --ignore-existing local/data-lake;
-      /usr/bin/mc anonymous set download local/data-lake;
-      echo 'Bucket data-lake configurado para Master Dataset y Checkpoints.';
-      exit 0;
-      "
+      - minio_data:/bitnami/minio/data
     networks:
       - uci_network
 
@@ -169,8 +145,8 @@ services:
     depends_on:
       kafka-init-topics:
         condition: service_completed_successfully
-      minio-init-bucket:
-        condition: service_completed_successfully
+      minio:
+        condition: service_started
       postgres-serving:
         condition: service_healthy
     ports:
@@ -208,13 +184,10 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://postgres:postgres_password@postgres-serving:5432/airflow_db
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
-    entrypoint: >
-      /bin/bash -c "
-      python -c \"import psycopg2; from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT; conn = psycopg2.connect(host='postgres-serving', user='postgres', password='postgres_password', dbname='serving_db'); conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT); cur = conn.cursor(); cur.execute(\\\"SELECT 1 FROM pg_database WHERE datname = 'airflow_db'\\\"); cur.fetchone() or cur.execute('CREATE DATABASE airflow_db;'); cur.close(); conn.close(); print('DB airflow_db verificada.')\"
-      airflow db migrate
-      airflow users create --username admin --firstname Admin --lastname UCI --role Admin --email admin@uci.local --password admin || true
-      echo 'Airflow inicializado exitosamente.'
-      "
+    entrypoint: ["bash", "-c"]
+    command: >
+      "airflow db init &&
+       airflow users create --username admin --firstname Admin --lastname UCI --role Admin --email admin@uci.local --password admin"
     networks:
       - uci_network
 

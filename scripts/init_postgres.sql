@@ -4,6 +4,9 @@
 -- Regla de Oro: Solo contiene vistas precomputadas e indexadas. Cero Staging.
 -- ==============================================================================
 
+-- Base de datos de metastore para Apache Airflow
+SELECT 'CREATE DATABASE airflow_db' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'airflow_db')\gexec
+
 -- 1. Capa Speed: vitals_realtime
 -- Actualizada en milisegundos por Spark Structured Streaming.
 -- Mantiene el último estado vivo y las alertas activas de cada paciente.
