@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Data and Checkpoints
+*.parquet
+*.csv
+*.jsonl
+checkpoints/
+spark-events/
+spark-warehouse/
+
+# Environment and secrets
+.env
+.env.local
+*.log
+
+# Airflow
+airflow/*.pid
+airflow/logs/
+
+# Node / React
+node_modules/
+dist/
+.vite/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
