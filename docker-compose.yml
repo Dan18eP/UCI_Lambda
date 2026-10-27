@@ -140,14 +140,9 @@ services:
   # 4. PROCESSING LAYER: Apache Spark (Speed & Batch Engine)
   # ============================================================================
   spark-master:
-    image: bitnami/spark:3.5.0
+    image: apache/spark:3.5.0
     container_name: spark-master
-    environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master --ip 0.0.0.0 --port 7077 --webui-port 8080
     ports:
       - "8080:8080"
       - "7077:7077"
@@ -155,15 +150,14 @@ services:
       - uci_network
 
   spark-worker:
-    image: bitnami/spark:3.5.0
+    image: apache/spark:3.5.0
     container_name: spark-worker
     depends_on:
       - spark-master
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 --webui-port 8081
     environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=2G
       - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
     networks:
       - uci_network
 
@@ -216,8 +210,7 @@ services:
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
     entrypoint: >
       /bin/bash -c "
-      # Crear base de datos airflow_db si no existe
-      PGPASSWORD=postgres_password psql -h postgres-serving -U postgres -d serving_db -tc \"SELECT 1 FROM pg_database WHERE datname = 'airflow_db'\" | grep -q 1 || PGPASSWORD=postgres_password psql -h postgres-serving -U postgres -d serving_db -c \"CREATE DATABASE airflow_db;\"
+      python -c \"import psycopg2; from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT; conn = psycopg2.connect(host='postgres-serving', user='postgres', password='postgres_password', dbname='serving_db'); conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT); cur = conn.cursor(); cur.execute(\\\"SELECT 1 FROM pg_database WHERE datname = 'airflow_db'\\\"); cur.fetchone() or cur.execute('CREATE DATABASE airflow_db;'); cur.close(); conn.close(); print('DB airflow_db verificada.')\"
       airflow db migrate
       airflow users create --username admin --firstname Admin --lastname UCI --role Admin --email admin@uci.local --password admin || true
       echo 'Airflow inicializado exitosamente.'
@@ -245,6 +238,7 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./batch_layer:/opt/airflow/batch_layer
+      - ./scripts:/opt/airflow/scripts
     command: webserver
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -269,6 +263,7 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./batch_layer:/opt/airflow/batch_layer
+      - ./scripts:/opt/airflow/scripts
     command: scheduler
     networks:
       - uci_network
