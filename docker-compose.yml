@@ -78,6 +78,21 @@ services:
     networks:
       - uci_network
 
+  icu-producer:
+    build:
+      context: ./producer
+      dockerfile: Dockerfile
+    container_name: icu-producer
+    depends_on:
+      kafka-init-topics:
+        condition: service_completed_successfully
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=vitals-stream
+      - EMISSION_INTERVAL_SEC=1.0
+    networks:
+      - uci_network
+
   # ============================================================================
   # 3. BATCH MASTER DATASET: MinIO (S3 Compatible Data Lake)
   # Cumple ADR-002: Master Dataset Append-Only crudo. CERO patrón Medallón.
