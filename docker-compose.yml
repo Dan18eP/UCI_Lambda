@@ -167,6 +167,36 @@ services:
     networks:
       - uci_network
 
+  speed-layer-spark:
+    build:
+      context: ./speed_layer
+      dockerfile: Dockerfile
+    container_name: speed-layer-spark
+    depends_on:
+      kafka-init-topics:
+        condition: service_completed_successfully
+      minio-init-bucket:
+        condition: service_completed_successfully
+      postgres-serving:
+        condition: service_healthy
+    ports:
+      - "4040:4040"
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=vitals-stream
+      - POSTGRES_HOST=postgres-serving
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=serving_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_password
+      - FASTAPI_INTERNAL_URL=http://fastapi-backend:8000/api/v1/internal/vitals-stream
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+      - CHECKPOINT_LOCATION=s3a://data-lake/checkpoints/speed_vitals/
+    networks:
+      - uci_network
+
   # ============================================================================
   # 5. ORCHESTRATION LAYER: Apache Airflow (Batch Only)
   # Cumple ADR-003: Orquestación estricta de procesos Batch (volcado horario a MinIO).
