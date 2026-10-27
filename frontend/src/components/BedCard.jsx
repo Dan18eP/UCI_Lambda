@@ -1,8 +1,9 @@
 import React from 'react';
+import { BrainIcon, AlertTriangleIcon, WrenchIcon } from './Icons';
 
 /**
  * Tarjeta de Monitoreo Individual por Cama UCI.
- * Cumple: BUSINESS_LOGIC.md (Visualización de 12 camas, semaforización clínica y alertas).
+ * Cumple: BUSINESS_LOGIC.md (Visualizacion de 12 camas, semaforizacion clinica y alertas, Cero emojis).
  */
 export default function BedCard({ bed, onOpenAssistant }) {
   const isSensorFault = !bed.is_valid_sensor;
@@ -19,7 +20,7 @@ export default function BedCard({ bed, onOpenAssistant }) {
     statusBadge = <span className="status-badge sensor">FALLO SENSOR</span>;
   } else if (isCritical) {
     cardClass += ' critical';
-    statusBadge = <span className="status-badge critical">CRÍTICO</span>;
+    statusBadge = <span className="status-badge critical">CRITICO</span>;
   } else if (isWarning) {
     cardClass += ' warning';
     statusBadge = <span className="status-badge warning">ADVERTENCIA</span>;
@@ -38,7 +39,7 @@ export default function BedCard({ bed, onOpenAssistant }) {
       <div className="card-body">
         <div className="vitals-row">
           <div className="vital-metric">
-            <div className="vital-label">Frec. Cardíaca</div>
+            <div className="vital-label">Frec. Cardiaca</div>
             <div className="vital-value" style={{ color: isCritical && bed.heart_rate_bpm > 140 ? '#ef4444' : '#f8fafc' }}>
               {isSensorFault ? '--' : bed.heart_rate_bpm}
               <span className="vital-unit">bpm</span>
@@ -51,7 +52,7 @@ export default function BedCard({ bed, onOpenAssistant }) {
           </div>
 
           <div className="vital-metric">
-            <div className="vital-label">Saturación SpO2</div>
+            <div className="vital-label">Saturacion SpO2</div>
             <div className="vital-value" style={{ color: isCritical && bed.spo2_percent < 88 ? '#ef4444' : '#f8fafc' }}>
               {isSensorFault ? '--' : `${bed.spo2_percent}%`}
             </div>
@@ -65,7 +66,7 @@ export default function BedCard({ bed, onOpenAssistant }) {
 
         <div className="vitals-row">
           <div className="vital-metric">
-            <div className="vital-label">Presión Arterial</div>
+            <div className="vital-label">Presion Arterial</div>
             <div className="vital-value" style={{ fontSize: '1.25rem' }}>
               {isSensorFault ? '--/--' : `${Math.round(bed.systolic_bp)}/${Math.round(bed.diastolic_bp)}`}
               <span className="vital-unit">mmHg</span>
@@ -86,14 +87,20 @@ export default function BedCard({ bed, onOpenAssistant }) {
           </div>
         </div>
 
-        {/* Notificación de Alerta o Diagnóstico */}
+        {/* Notificacion de Alerta o Diagnostico */}
         {(isCritical || isSensorFault || isWarning) && (
           <div className="alert-box" style={{
             backgroundColor: isCritical ? 'rgba(239, 68, 68, 0.15)' : isSensorFault ? 'rgba(139, 92, 246, 0.15)' : 'rgba(245, 158, 11, 0.15)',
             borderColor: isCritical ? 'rgba(239, 68, 68, 0.4)' : isSensorFault ? 'rgba(139, 92, 246, 0.4)' : 'rgba(245, 158, 11, 0.4)',
-            color: isCritical ? '#fca5a5' : isSensorFault ? '#d8b4fe' : '#fde68a'
+            color: isCritical ? '#fca5a5' : isSensorFault ? '#d8b4fe' : '#fde68a',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
           }}>
-            <strong>{isSensorFault ? '🔧 Sensor:' : '🚨 Alerta:'}</strong> {bed.alert_reason}
+            {isSensorFault ? <WrenchIcon size={14} /> : <AlertTriangleIcon size={14} />}
+            <span>
+              <strong>{isSensorFault ? 'Sensor:' : 'Alerta:'}</strong> {bed.alert_reason}
+            </span>
           </div>
         )}
       </div>
@@ -105,9 +112,9 @@ export default function BedCard({ bed, onOpenAssistant }) {
         <button
           className="ml-button"
           onClick={() => onOpenAssistant(bed)}
-          title="Ejecutar inferencia del modelo tabular (<3ms)"
+          title="Inferencia de clasificador tabular (<3ms)"
         >
-          🤖 Asistente ML
+          <BrainIcon size={14} /> Asistente ML
         </button>
       </div>
     </div>

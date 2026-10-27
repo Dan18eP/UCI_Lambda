@@ -294,7 +294,7 @@ services:
   # ============================================================================
   fastapi-backend:
     build:
-      context: ./backend
+      context: ./serving_layer
       dockerfile: Dockerfile
     container_name: fastapi-backend
     depends_on:

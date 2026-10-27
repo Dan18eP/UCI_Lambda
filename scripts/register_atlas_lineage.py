@@ -33,7 +33,7 @@ def wait_for_atlas(max_retries: int = 30, delay_sec: int = 5):
         try:
             res = requests.get(health_url, auth=HTTPBasicAuth(ATLAS_USER, ATLAS_PASSWORD), timeout=5)
             if res.status_code in [200, 204]:
-                logger.info(f"✅ Apache Atlas está activo y respondiendo (intento {i}).")
+                logger.info(f" Apache Atlas está activo y respondiendo (intento {i}).")
                 return True
         except Exception:
             pass
@@ -180,13 +180,13 @@ def register_entities_in_atlas():
         )
 
         if res.status_code in [200, 201]:
-            logger.info("✅ Linaje y entidades registradas exitosamente en Apache Atlas:")
+            logger.info(" Linaje y entidades registradas exitosamente en Apache Atlas:")
             data = res.json()
             created = data.get("mutatedEntities", {}).get("CREATE", [])
             updated = data.get("mutatedEntities", {}).get("UPDATE", [])
             logger.info(f"   • Entidades creadas: {len(created)}")
             logger.info(f"   • Entidades actualizadas: {len(updated)}")
-            logger.info(f"🌐 Visualice el grafo en: http://localhost:21000")
+            logger.info(f" Visualice el grafo en: http://localhost:21000")
         else:
             logger.error(f"Error registrando en Atlas (Status {res.status_code}): {res.text}")
     except Exception as e:

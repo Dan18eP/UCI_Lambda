@@ -1,10 +1,10 @@
-# 📜 Reglas de Oro del Proyecto (Architectural & Engineering Rules)
+# Reglas de Oro del Proyecto (Architectural & Engineering Rules)
 
 Este documento establece las **reglas inmutables de arquitectura, código, gobernanza e infraestructura** para el repositorio de Arquitectura Lambda de Monitoreo UCI. Todo cambio, PR o generación de código asistida por IA debe cumplir estrictamente estas directrices.
 
 ---
 
-## 🏛️ 1. Reglas Arquitectónicas (Líneas Rojas del Team Leader)
+## 1. Reglas Arquitectónicas (Líneas Rojas del Team Leader)
 
 1. **Cero Medallón en la Arquitectura Lambda:**
    * Queda estrictamente prohibido estructurar carpetas o capas como `bronze`, `silver` o `gold`.
@@ -29,7 +29,7 @@ Este documento establece las **reglas inmutables de arquitectura, código, gober
 
 ---
 
-## 💻 2. Reglas de Código y Desarrollo
+## 2. Reglas de Código y Desarrollo
 
 1. **Calidad y Claridad de Código:**
    * Código en Python limpio, tipado (Type Hints) y documentado según PEP 8.
@@ -45,7 +45,7 @@ Este documento establece las **reglas inmutables de arquitectura, código, gober
 
 ---
 
-## 🌐 3. Reglas del Frontend (React + Cero Mocks & Encapsulamiento)
+## 3. Reglas del Frontend (React + Cero Mocks & Encapsulamiento)
 
 1. **Stack Tecnológico:**
    * El frontend se construye en **React** (Vite + React), optimizado para renderizado reactivo de alta frecuencia y baja latencia sin recargar la página.
@@ -53,7 +53,7 @@ Este documento establece las **reglas inmutables de arquitectura, código, gober
 2. **Política Estricta de "Cero Mocks":**
    * El frontend jamás presentará datos falsos o simulados en memoria (*hardcoded*).
    * Si la Capa de Servicio está vacía o el pipeline no ha corrido, la pantalla debe mostrar un **aviso arquitectónico explícito**:  
-     `⚠️ Aviso de Auditoría: Capa de Servicio vacía. Esperando que el pipeline ingiera eventos reales.`
+     ` Aviso de Auditoría: Capa de Servicio vacía. Esperando que el pipeline ingiera eventos reales.`
 
 3. **Encapsulamiento del Backend (Consumo de Solo Lectura):**
    * El frontend **no conoce** la existencia de Kafka, Spark, MinIO, Airflow, Atlas ni OpenMetadata.
@@ -72,7 +72,7 @@ Este documento establece las **reglas inmutables de arquitectura, código, gober
 
 ---
 
-## 🛡️ 4. Reglas de Gobernanza y Linaje
+## 4. Reglas de Gobernanza y Linaje
 
 1. **Registro Automatizado en Apache Atlas (Puerto 21000):**
    * Se utiliza la API REST v2 de Atlas (`/api/atlas/v2/entity/bulk`) mediante el script oficial del proyecto para registrar entidades y linaje. Se evita la configuración manual de plugins Hadoop que causen fallos de classpath.
@@ -82,7 +82,7 @@ Este documento establece las **reglas inmutables de arquitectura, código, gober
 
 ---
 
-## 🤖 5. Reglas para el Uso de Inteligencia Artificial
+## 5. Reglas para el Uso de Inteligencia Artificial
 
 1. **Dominio Humano sobre la IA:**
    * La IA se utiliza como acelerador y validador, pero el ingeniero debe comprender, justificar y defender cada decisión técnica.

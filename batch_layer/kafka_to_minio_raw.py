@@ -69,10 +69,10 @@ def dump_stream_to_master_dataset():
     consumer.close()
 
     if not records:
-        logger.info("ℹ️ No hay nuevos eventos en Kafka para volcar al Master Dataset.")
+        logger.info("ℹ No hay nuevos eventos en Kafka para volcar al Master Dataset.")
         return
 
-    logger.info(f"📥 {len(records)} eventos consumidos. Preparando volcado a MinIO...")
+    logger.info(f" {len(records)} eventos consumidos. Preparando volcado a MinIO...")
 
     # Evaluación de Calidad en Memoria (Banderas booleanas sin carpetas de cuarentena)
     for r in records:
@@ -98,9 +98,9 @@ def dump_stream_to_master_dataset():
     try:
         with fs.open(file_path, "wb") as f:
             pq.write_table(table, f, compression="snappy")
-        logger.info(f"✅ Master Dataset actualizado con éxito (Append-Only): s3a://{file_path}")
+        logger.info(f" Master Dataset actualizado con éxito (Append-Only): s3a://{file_path}")
     except Exception as e:
-        logger.error(f"❌ Error al escribir en MinIO: {e}")
+        logger.error(f" Error al escribir en MinIO: {e}")
         sys.exit(1)
 
 

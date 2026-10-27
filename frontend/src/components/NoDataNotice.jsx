@@ -1,29 +1,32 @@
 import React from 'react';
+import { AlertTriangleIcon } from './Icons';
 
 /**
- * Componente de Aviso de Auditoría cuando la Serving Layer no tiene registros aún.
- * Cumple: ADR-006 & RULES.md (Cero datos falsos o simulados en memoria).
+ * Componente de Aviso de Auditoria cuando la Serving Layer no tiene registros aun.
+ * Cumple: ADR-006 & RULES.md (Cero datos falsos o simulados en memoria, Cero emojis).
  */
 export default function NoDataNotice({ message }) {
   return (
     <div style={{
-      backgroundColor: 'rgba(245, 158, 11, 0.1)',
-      border: '2px dashed #f59e0b',
-      borderRadius: '12px',
-      padding: '40px 24px',
+      backgroundColor: 'rgba(245, 158, 11, 0.08)',
+      border: '1px solid #d97706',
+      borderRadius: '8px',
+      padding: '36px 24px',
       textAlign: 'center',
       margin: '40px auto',
-      maxWidth: '800px'
+      maxWidth: '750px'
     }}>
-      <div style={{ fontSize: '3rem', marginBottom: '16px' }}>⚠️</div>
-      <h2 style={{ color: '#fbbf24', fontSize: '1.4rem', marginBottom: '12px' }}>
-        Aviso de Auditoría de Arquitectura
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
+        <AlertTriangleIcon size={44} color="#f59e0b" />
+      </div>
+      <h2 style={{ color: '#fbbf24', fontSize: '1.25rem', marginBottom: '10px', fontWeight: 600 }}>
+        Aviso de Auditoria de Arquitectura
       </h2>
-      <p style={{ color: '#e2e8f0', fontSize: '1rem', lineHeight: '1.6', maxWidth: '600px', margin: '0 auto' }}>
-        {message || 'Capa de Servicio vacía. Esperando que el pipeline distribuido (Kafka ➔ Spark ➔ PostgreSQL) ingiera eventos reales.'}
+      <p style={{ color: '#e2e8f0', fontSize: '0.95rem', lineHeight: '1.5', maxWidth: '600px', margin: '0 auto' }}>
+        {message || 'Capa de Servicio vacia. Esperando ingestion de eventos desde el pipeline Lambda.'}
       </p>
-      <div style={{ marginTop: '20px', fontSize: '0.85rem', color: '#94a3b8' }}>
-        <em>* Cumpliendo la política estricta de Cero Mocks: la interfaz no inventa telemetría ni dibuja datos ficticios.</em>
+      <div style={{ marginTop: '16px', fontSize: '0.8rem', color: '#94a3b8' }}>
+        * Politica estricta de Cero Mocks: la interfaz no genera datos ficticios ni emula estados en memoria.
       </div>
     </div>
   );

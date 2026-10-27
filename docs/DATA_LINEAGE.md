@@ -1,10 +1,10 @@
-# 🗺️ Linaje del Dato (Data Lineage) - Arquitectura Lambda UCI
+# Linaje del Dato (Data Lineage) - Arquitectura Lambda UCI
 
 Documento técnico de trazabilidad, linaje de datos de extremo a extremo, contratos de interfaces y ciclo de vida de la información para el **Sistema de Monitoreo Crítico de Pacientes en UCI**.
 
 ---
 
-## 🧭 1. Diagrama Global de Linaje (End-to-End Lineage)
+## 1. Diagrama Global de Linaje (End-to-End Lineage)
 
 ```mermaid
 flowchart TD
@@ -17,12 +17,12 @@ flowchart TD
     end
 
     subgraph S2_SPEED["2. CAPA SPEED (Tiempo Real Always-On)"]
-        SPARK_STR["Spark Structured Streaming 24/7<br/>• Consumo streaming directo de Kafka<br/>• Ventana en memoria (1 minuto)<br/>• Detección de umbrales críticos<br/>• foreachBatch Dual Action:<br/>  1. JDBC Write ➔ PostgreSQL<br/>  2. HTTP Push ➔ FastAPI Broadcast<br/>• Checkpoint en MinIO (Tolerancia a fallos)"]
+        SPARK_STR["Spark Structured Streaming 24/7<br/>• Consumo streaming directo de Kafka<br/>• Ventana en memoria (1 minuto)<br/>• Detección de umbrales críticos<br/>• foreachBatch Dual Action:<br/>  1. JDBC Write  PostgreSQL<br/>  2. HTTP Push  FastAPI Broadcast<br/>• Checkpoint en MinIO (Tolerancia a fallos)"]
     end
 
     subgraph S2_BATCH["2. CAPA BATCH (Planificada & Idempotente)"]
         AIRFLOW["Apache Airflow (Scheduler)<br/>DAG: uci_batch_pipeline"]
-        TASK_DUMP["Task 1: Volcado Inmutable<br/>Kafka ➔ MinIO Parquet"]
+        TASK_DUMP["Task 1: Volcado Inmutable<br/>Kafka  MinIO Parquet"]
         MINIO_RAW["MinIO: Master Dataset<br/>s3a://data-lake/raw-vitals/<br/>year=YYYY/month=MM/day=DD/hour=HH/"]
         TASK_SPARK["Task 2: Cálculo Histórico<br/>Spark Batch Job"]
     end
@@ -74,7 +74,7 @@ flowchart TD
 
 ---
 
-## 📊 2. Matriz Detallada de Trazabilidad del Dato
+## 2. Matriz Detallada de Trazabilidad del Dato
 
 | Etapa del Linaje | Entidad Origen | Entidad Destino | Transformación Aplicada | Modo de Escritura | Frecuencia / Latencia |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -87,7 +87,7 @@ flowchart TD
 
 ---
 
-## 🗃️ 3. Contratos de Datos y Esquemas por Capa
+## 3. Contratos de Datos y Esquemas por Capa
 
 ### A. Capa de Ingesta (Kafka Payload)
 * **Topic:** `vitals-stream`
@@ -162,7 +162,7 @@ CREATE INDEX idx_vitals_historico_patient ON vitals_historico(patient_id);
 
 ---
 
-## 🛡️ 4. Tolerancia a Fallos y Garantías de Entrega
+## 4. Tolerancia a Fallos y Garantías de Entrega
 
 1. **Garantía en Speed Layer (At-Least-Once / Effectively-Once):**
    * Spark Structured Streaming utiliza checkpoints en MinIO (`s3a://data-lake/checkpoints/speed_vitals/`).
@@ -176,7 +176,7 @@ CREATE INDEX idx_vitals_historico_patient ON vitals_historico(patient_id);
 
 ---
 
-## 🔍 5. Trazabilidad con OpenMetadata / OpenLineage
+## 5. Trazabilidad con OpenMetadata / OpenLineage
 
 Para auditar el linaje frente al TL:
 1. El listener `io.openlineage.spark.agent.OpenLineageSparkListener` intercepta los planes lógicos de ejecución en Spark.

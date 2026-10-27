@@ -1,8 +1,8 @@
-# 🏛️ Blueprint Arquitectura Lambda: Monitoreo Crítico en UCI (Tiempo Real + Histórico)
+# Blueprint Arquitectura Lambda: Monitoreo Crítico en UCI (Tiempo Real + Histórico)
 
 Guía técnica y de despliegue para la implementación estricta de una **Arquitectura Lambda** gobernada para el monitoreo de pacientes en UCI, utilizando **Apache Kafka (KRaft)**, **MinIO (Master Dataset Append-Only)**, **Apache Spark**, **Apache Airflow**, **PostgreSQL (Serving)**, **FastAPI (WebSockets + REST)** y **Frontend Cero Mocks**.
 
-> 📖 **Documentación Especializada:**
+>  **Documentación Especializada:**
 > * [ADRS.md](docs/ADRs/ADRS.md) - Registro formal de decisiones de arquitectura (ADRs 001 al 008).
 > * [RULES.md](docs/RULES.md) - Reglas inmutables de arquitectura, código, gobernanza e infraestructura.
 > * [DATA_LINEAGE.md](docs/DATA_LINEAGE.md) - Mapa detallado de trazabilidad, contratos de interfaces y ciclo de vida de punta a punta.
@@ -10,7 +10,7 @@ Guía técnica y de despliegue para la implementación estricta de una **Arquite
 
 ---
 
-## 🎯 1. Reglas de Oro Arquitectónicas (Criterio Estricto del TL)
+## 1. Reglas de Oro Arquitectónicas (Criterio Estricto del TL)
 
 1. **CERO Patrón Medallón en Lambda:**
    * **No existen capas de colores (Bronce, Plata, Oro).** Medallón es para Data Lakehouses analíticos pesados de BI.
@@ -29,7 +29,7 @@ Guía técnica y de despliegue para la implementación estricta de una **Arquite
 
 ---
 
-## 🗺️ 2. Linaje del Dato (Data Lineage) y Flujo de Información
+## 2. Linaje del Dato (Data Lineage) y Flujo de Información
 
 ```
                                   ┌──► [CAPA SPEED: Spark Streaming 24/7] ──────────► [PostgreSQL: vitals_realtime] ──┐
@@ -49,7 +49,7 @@ Guía técnica y de despliegue para la implementación estricta de una **Arquite
 
 ---
 
-## 💾 3. Esquema de Datos y Capa de Servicio (PostgreSQL)
+## 3. Esquema de Datos y Capa de Servicio (PostgreSQL)
 
 ### A. Payload del Evento en Kafka (`vitals-stream`)
 ```json
@@ -74,7 +74,7 @@ Guía técnica y de despliegue para la implementación estricta de una **Arquite
 
 ---
 
-## 🐳 4. Mapa de Infraestructura Docker
+## 4. Mapa de Infraestructura Docker
 
 | Servicio | Contenedor | Puerto Local | Propósito de Auditoría |
 | :--- | :--- | :--- | :--- |
@@ -89,7 +89,7 @@ Guía técnica y de despliegue para la implementación estricta de una **Arquite
 
 ---
 
-## 🛡️ 5. Guía de Defensa ante Preguntas del Team Leader (TL)
+## 5. Guía de Defensa ante Preguntas del Team Leader (TL)
 
 * **¿Por qué NO implementaste el patrón Medallón (Bronze/Silver/Gold)?**
   > *"Medallón es un patrón de arquitectura Lakehouse pensado para almacenes analíticos y data warehouses empresariales. En una Arquitectura Lambda canónica, la capa Batch tiene una responsabilidad distinta: almacenar el **Master Dataset inmutable y en crudo (Append-Only)** en MinIO, y precomputar vistas por lotes. Introducir Bronze/Silver/Gold aquí sería sobreingeniería redundante que agregaría latencia y complejidad innecesaria."*

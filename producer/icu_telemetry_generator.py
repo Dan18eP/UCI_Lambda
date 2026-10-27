@@ -152,7 +152,7 @@ def create_kafka_producer(servers: str, max_retries: int = 20, delay_sec: int = 
                 retries=3,
                 linger_ms=10
             )
-            logger.info(f"✅ Conexión establecida con Kafka (intento {attempt}).")
+            logger.info(f" Conexión establecida con Kafka (intento {attempt}).")
             return producer
         except NoBrokersAvailable as e:
             logger.warning(f"Kafka aún no disponible (intento {attempt}/{max_retries}). Reintentando en {delay_sec}s...")
@@ -161,7 +161,7 @@ def create_kafka_producer(servers: str, max_retries: int = 20, delay_sec: int = 
             logger.error(f"Error inesperado al conectar con Kafka: {e}")
             time.sleep(delay_sec)
 
-    logger.critical("❌ No fue posible conectar con Kafka tras múltiples intentos.")
+    logger.critical(" No fue posible conectar con Kafka tras múltiples intentos.")
     sys.exit(1)
 
 
@@ -234,7 +234,7 @@ def run_producer():
 
             producer.flush()
             if total_emitted % 120 == 0:
-                logger.info(f"📡 [Telemetría Activa] {total_emitted} eventos emitidos a Kafka KRaft.")
+                logger.info(f" [Telemetría Activa] {total_emitted} eventos emitidos a Kafka KRaft.")
 
             elapsed = time.time() - cycle_start
             sleep_time = max(0.0, EMISSION_INTERVAL_SEC - elapsed)

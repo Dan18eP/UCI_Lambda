@@ -4,6 +4,7 @@ import ClinicSelector from './components/ClinicSelector';
 import BedCard from './components/BedCard';
 import NoDataNotice from './components/NoDataNotice';
 import ClinicalAssistantModal from './components/ClinicalAssistantModal';
+import { PulseIcon } from './components/Icons';
 
 const API_BASE = 'http://localhost:8000';
 const WS_URL = 'ws://localhost:8000/ws/alerts';
@@ -33,7 +34,7 @@ export default function App() {
       }
     } catch (err) {
       console.warn('Backend aún no disponible o inicializando:', err);
-      setNoDataMessage('Conectando con la Capa de Servicio de FastAPI...');
+      setNoDataMessage('Conectando con la Capa de Servicio...');
     }
   }, [selectedClinic]);
 
@@ -41,7 +42,7 @@ export default function App() {
     fetchDashboard();
   }, [fetchDashboard]);
 
-  // 2. Conexión WebSocket para Telemetría Reactiva en Vivo (<40ms)
+  // 2. Conexion WebSocket para Telemetria Reactiva en Vivo (<40ms)
   useEffect(() => {
     let socket = null;
     let reconnectTimer = null;
@@ -65,13 +66,11 @@ export default function App() {
                 next[index] = { ...next[index], ...updated };
                 return next;
               }
-              // Si no existía y coincide con el filtro, añadirlo
               if (!selectedClinic || updated.clinic_id === selectedClinic) {
                 return [...prevBeds, updated];
               }
               return prevBeds;
             });
-            // Si estábamos en estado NO_DATA, limpiarlo al recibir datos vivos
             setNoDataMessage(null);
           }
         } catch (e) {
@@ -99,14 +98,16 @@ export default function App() {
 
   return (
     <div>
-      {/* 1. Barra de Auditoría Superior para el Team Leader */}
+      {/* 1. Barra de Auditoria Superior para el Team Leader */}
       <AuditorBar />
 
       {/* 2. Cabecera del Centro de Monitoreo */}
       <header className="dashboard-header">
         <div className="brand-section">
           <h1>
-            🏥 Red UCI Metropolitana
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <PulseIcon size={24} color="#3b82f6" /> Red UCI Metropolitana
+            </span>
             <span style={{
               fontSize: '0.75rem',
               backgroundColor: wsConnected ? '#065f46' : '#7f1d1d',
@@ -114,11 +115,11 @@ export default function App() {
               padding: '2px 8px',
               borderRadius: '12px'
             }}>
-              {wsConnected ? '● WebSocket Conectado (<40ms)' : '○ Reconectando...'}
+              {wsConnected ? 'WebSocket Activo (<40ms)' : 'Reconectando...'}
             </span>
           </h1>
           <p className="brand-subtitle">
-            Monitoreo en Tiempo Real (Spark Speed) + Histórico (MinIO Parquet Batch) + Soporte ML Tabular (&lt;3ms).
+            Monitoreo en Tiempo Real (Spark Speed) + Historico (MinIO Parquet Batch) + Soporte ML Tabular (&lt;3ms).
           </p>
         </div>
 
@@ -145,7 +146,7 @@ export default function App() {
         )}
       </main>
 
-      {/* 4. Modal de Inferencia del Asistente Clínico */}
+      {/* 4. Modal de Inferencia del Asistente Clinico */}
       {activeAssistantBed && (
         <ClinicalAssistantModal
           bed={activeAssistantBed}

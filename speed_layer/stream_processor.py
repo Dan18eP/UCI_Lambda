@@ -75,7 +75,7 @@ def process_micro_batch(batch_df, batch_id):
     if not records:
         return
 
-    logger.info(f"⚡ Procesando micro-batch {batch_id} con {len(records)} eventos.")
+    logger.info(f" Procesando micro-batch {batch_id} con {len(records)} eventos.")
 
     # 1. Preparar datos para PostgreSQL
     upsert_query = """
@@ -159,7 +159,7 @@ def build_spark_speed_session():
 
 
 def main():
-    logger.info("🚀 Iniciando Capa Speed de Spark Structured Streaming...")
+    logger.info(" Iniciando Capa Speed de Spark Structured Streaming...")
     spark = build_spark_speed_session()
 
     # 1. Ingesta Continua desde Kafka
@@ -212,7 +212,7 @@ def main():
         .option("checkpointLocation", CHECKPOINT_LOCATION) \
         .start()
 
-    logger.info("📡 Capa Speed en ejecución continua (Spark UI disponible en puerto 4040).")
+    logger.info(" Capa Speed en ejecución continua (Spark UI disponible en puerto 4040).")
     query.awaitTermination()
 
 

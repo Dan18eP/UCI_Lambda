@@ -54,10 +54,10 @@ def compute_and_update_historical_views():
         return
 
     if not files:
-        logger.info("ℹ️ No hay archivos Parquet en el Master Dataset aún. Finalizando.")
+        logger.info("ℹ No hay archivos Parquet en el Master Dataset aún. Finalizando.")
         return
 
-    logger.info(f"📊 Encontrados {len(files)} archivos Parquet en el Master Dataset. Consolidando...")
+    logger.info(f" Encontrados {len(files)} archivos Parquet en el Master Dataset. Consolidando...")
 
     # Cargar y concatenar DataFrames
     dfs = []
@@ -167,9 +167,9 @@ def compute_and_update_historical_views():
         conn.commit()
         cur.close()
         conn.close()
-        logger.info(f"✅ {len(historical_records)} registros históricos consolidados con idempotencia en PostgreSQL.")
+        logger.info(f" {len(historical_records)} registros históricos consolidados con idempotencia en PostgreSQL.")
     except Exception as e:
-        logger.error(f"❌ Error al persistir vistas históricas en PostgreSQL: {e}")
+        logger.error(f" Error al persistir vistas históricas en PostgreSQL: {e}")
         sys.exit(1)
 
 

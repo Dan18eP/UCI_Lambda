@@ -1,10 +1,10 @@
-# 📋 Registro de Decisiones de Arquitectura (Architecture Decision Records - ADRs)
+# Registro de Decisiones de Arquitectura (Architecture Decision Records - ADRs)
 
 Este documento recopila las decisiones arquitectónicas fundamentales tomadas para el diseño, despliegue y defensa técnica de la **Arquitectura Lambda de Monitoreo Crítico en UCI**. Cada registro sigue el formato estándar formal (Contexto, Decisión, Estado y Consecuencias).
 
 ---
 
-## 📑 Índice de ADRs
+## Índice de ADRs
 
 | ID | Título | Estado | Fecha |
 | :--- | :--- | :---: | :---: |

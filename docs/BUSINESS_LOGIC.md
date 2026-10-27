@@ -1,10 +1,10 @@
-# 🩺 Lógica de Negocio (Business Logic) - Monitoreo Crítico UCI
+# Lógica de Negocio (Business Logic) - Monitoreo Crítico UCI
 
 Documento de especificación funcional, reglas clínicas, validaciones fisiológicas y comportamiento del sistema ante eventos para el **Monitoreo de Signos Vitales en Tiempo Real y Análisis Histórico en UCI**.
 
 ---
 
-## 🎯 1. Propósito Clínico y Desafío de Negocio
+## 1. Propósito Clínico y Desafío de Negocio
 
 En las Unidades de Cuidados Intensivos (UCI) y salas de reanimación, la velocidad de respuesta médica ante el deterioro agudo de un paciente determina su supervivencia:
 * **Paro cardiorrespiratorio y arritmias malignas:** El daño cerebral irreversible comienza tras 3-4 minutos de hipoxia o colapso hemodinámico.
@@ -15,7 +15,7 @@ En las Unidades de Cuidados Intensivos (UCI) y salas de reanimación, la velocid
 
 ---
 
-## 👤 2. Entidades del Dominio
+## 2. Entidades del Dominio
 
 ```
 ┌────────────────────────────────┐       ┌────────────────────────────────┐
@@ -49,7 +49,7 @@ En las Unidades de Cuidados Intensivos (UCI) y salas de reanimación, la velocid
 
 ---
 
-## 🚨 3. Reglas Fisiológicas y Umbrales de Alerta (Speed Layer)
+## 3. Reglas Fisiológicas y Umbrales de Alerta (Speed Layer)
 
 La Capa Speed evalúa cada evento recibido contra los siguientes parámetros estandarizados de medicina intensiva:
 
@@ -86,7 +86,7 @@ def evaluate_clinical_alert(vitals):
 
 ---
 
-## 🛠️ 4. Reglas de Calidad y Fallos de Sensor (Cero Cuarentena)
+## 4. Reglas de Calidad y Fallos de Sensor (Cero Cuarentena)
 
 Para evitar la contaminación de métricas sin utilizar el anti-patrón de "carpetas de cuarentena":
 
@@ -103,7 +103,7 @@ Para evitar la contaminación de métricas sin utilizar el anti-patrón de "carp
 
 ---
 
-## 📈 5. Lógica Analítica de la Capa Batch (Airflow + Spark)
+## 5. Lógica Analítica de la Capa Batch (Airflow + Spark)
 
 Mientras la Capa Speed evalúa instantes puntuales, la Capa Batch genera la **línea base (baseline)** del paciente cada hora:
 
@@ -118,7 +118,7 @@ Mientras la Capa Speed evalúa instantes puntuales, la Capa Batch genera la **l�
 
 ---
 
-## 🌐 6. Política de Integración Frontend y "Cero Mocks"
+## 6. Política de Integración Frontend y "Cero Mocks"
 
 El frontend opera bajo tres estados formales:
 
@@ -151,7 +151,7 @@ El frontend opera bajo tres estados formales:
 
 ---
 
-## 🤖 7. Modelo Predictivo Tabular de Deterioro Clínico (Scikit-Learn / XGBoost)
+## 7. Modelo Predictivo Tabular de Deterioro Clínico (Scikit-Learn / XGBoost)
 
 Para apoyar al personal médico sin introducir latencias en el streaming de Spark, el sistema incorpora un clasificador tabular ultrarrápido (< 3 ms de inferencia) desacoplado en FastAPI.
 
