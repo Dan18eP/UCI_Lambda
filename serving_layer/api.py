@@ -1,6 +1,7 @@
 """
 Capa de Servicio (Serving Layer) - API Gateway y WebSocket.
-FastAPI de Alta Concurrencia para Monitoreo UCI y Modelo Tabular ML.
+FastAPI de Alta Concurrencia para Monitoreo UCI, Asistente Batch ML y Telemetria de Auditoria.
+Cero emojis en codigo y respuestas.
 """
 
 import json
@@ -10,7 +11,16 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPExceptio
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from db import init_db, check_health, fetch_dashboard_beds, fetch_patient_snapshot, save_prediction
+from db import (
+    init_db,
+    check_health,
+    fetch_dashboard_beds,
+    fetch_patient_snapshot,
+    save_prediction,
+    fetch_historical_analytics,
+    fetch_audit_metrics,
+    query_batch_assistant
+)
 from clinical_model import clinical_model
 
 logging.basicConfig(
@@ -151,3 +161,56 @@ def evaluate_patient_endpoint(req: EvaluationRequest):
         logger.error(f"Error al registrar prediccion en base de datos: {e}")
 
     return eval_result
+
+
+@app.get("/api/v1/analytics/history")
+def analytics_history_endpoint(
+    clinic_id: Optional[str] = Query(None),
+    patient_id: Optional[str] = Query(None),
+    hours: int = Query(24, ge=1, le=168)
+):
+    """
+    Consulta analitica del Batch Layer: vitals_historico en PostgreSQL precomputado desde MinIO Parquet.
+    Permite examinar tendencias horarias agregadas y comparar sedes sin latencia en la capa streaming.
+    """
+    data = fetch_historical_analytics(clinic_id=clinic_id, patient_id=patient_id, limit_hours=hours)
+    return {
+        "status": "SUCCESS",
+        "layer": "Batch Layer (vitals_historico)",
+        "source": "MinIO Data Lake (Raw Parquet Master Dataset) consolidado por Airflow",
+        "data": data
+    }
+
+
+@app.get("/api/v1/audit/metrics")
+def audit_metrics_endpoint():
+    """
+    Retorna metricas y contadores de auditoria en vivo del pipeline Lambda.
+    Permite a la consola de auditoria y linaje mostrar actividad en tiempo real.
+    """
+    metrics = fetch_audit_metrics()
+    return {
+        "status": "SUCCESS",
+        "pipeline": "UCI Lambda Architecture",
+        "metrics": metrics
+    }
+
+
+class AssistantChatRequest(BaseModel):
+    patient_id: Optional[str] = None
+    query: str
+
+
+@app.post("/api/v1/assistant/chat")
+def assistant_chat_endpoint(req: AssistantChatRequest):
+    """
+    Chatbot Asistente Clinico basado en Batch Data.
+    Responde consultas diagnosticas y proyecciones de riesgo usando los registros consolidados
+    de la Capa Batch (vitals_historico) para no sobrecargar el Speed Layer.
+    """
+    res = query_batch_assistant(patient_id=req.patient_id, query_text=req.query)
+    return {
+        "status": "SUCCESS",
+        "query": req.query,
+        "response": res
+    }
