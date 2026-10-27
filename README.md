@@ -3,7 +3,7 @@
 Guía técnica y de despliegue para la implementación estricta de una **Arquitectura Lambda** gobernada para el monitoreo de pacientes en UCI, utilizando **Apache Kafka (KRaft)**, **MinIO (Master Dataset Append-Only)**, **Apache Spark**, **Apache Airflow**, **PostgreSQL (Serving)**, **FastAPI (WebSockets + REST)** y **Frontend Cero Mocks**.
 
 > 📖 **Documentación Especializada:**
-> * [ADRS.md](docs/ADRs/ADRS.md) - Registro formal de decisiones de arquitectura (ADRs 001 al 007).
+> * [ADRS.md](docs/ADRs/ADRS.md) - Registro formal de decisiones de arquitectura (ADRs 001 al 008).
 > * [RULES.md](docs/RULES.md) - Reglas inmutables de arquitectura, código, gobernanza e infraestructura.
 > * [DATA_LINEAGE.md](docs/DATA_LINEAGE.md) - Mapa detallado de trazabilidad, contratos de interfaces y ciclo de vida de punta a punta.
 > * [BUSINESS_LOGIC.md](docs/BUSINESS_LOGIC.md) - Especificación del dominio clínico UCI, reglas fisiológicas, umbrales de alerta y validación de hardware.
@@ -55,6 +55,7 @@ Guía técnica y de despliegue para la implementación estricta de una **Arquite
 ```json
 {
   "event_id": "a5d89f21-7e8c-4a11-b0e2-9f3b890a1234",
+  "clinic_id": "CLI-CENTRAL-01",
   "patient_id": "PAT-1082",
   "bed_id": "UCI-BED-04",
   "timestamp": "2026-10-26T21:15:30.120Z",
@@ -62,6 +63,7 @@ Guía técnica y de despliegue para la implementación estricta de una **Arquite
   "spo2_percent": 88.5,
   "systolic_bp": 85.0,
   "diastolic_bp": 55.0,
+  "respiratory_rate": 22.0,
   "device_id": "MON-PHILIPS-09"
 }
 ```
@@ -82,7 +84,7 @@ Guía técnica y de despliegue para la implementación estricta de una **Arquite
 | **Spark Master UI** | `spark-master` | `8080` | Cluster y aplicaciones registradas. |
 | **PostgreSQL** | `postgres-serving` | `5432` | Capa de Servicio (tablas `vitals_realtime` y `vitals_historico`). |
 | **Apache Airflow** | `airflow-webserver`| `8085` | Orquestador de la capa Batch (volcado horario). |
-| **Capa Servicio / API**| `fastapi-backend` | `8000` | Endpoints REST (`/api/v1/patients`) y **WebSocket (`/ws/alerts`)**. |
+| **Capa Servicio / API**| `fastapi-backend` | `8000` | Endpoints REST (`/api/v1/dashboard`, `/api/v1/clinical-assistant`) y **WebSocket (`/ws/alerts`)**. |
 | **Frontend UCI** | `frontend-ui` | `3000` | Monitor médico en vivo (cero mocks). |
 
 ---

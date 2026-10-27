@@ -15,6 +15,7 @@ Este documento recopila las decisiones arquitectónicas fundamentales tomadas pa
 | **[ADR-005](#adr-005-transmisión-reactiva-instantánea-spark-foreachbatch--websocket)** | Transmisión Reactiva Instantánea (Spark `foreachBatch` + FastAPI WebSocket) | **Aceptado** | 2026-10-26 |
 | **[ADR-006](#adr-006-frontend-react-desacoplado-cero-mocks-y-barra-de-auditoría)** | Frontend React Desacoplado, Cero Mocks y Barra de Auditoría | **Aceptado** | 2026-10-26 |
 | **[ADR-007](#adr-007-estrategia-dual-de-gobernanza-openmetadata--apache-atlas)** | Estrategia Dual de Gobernanza y Linaje (OpenMetadata + Apache Atlas) | **Aceptado** | 2026-10-26 |
+| **[ADR-008](#adr-008-integración-de-modelo-predictivo-tabular-scikit-learn--xgboost-desacoplado-de-la-capa-speed)** | Integración de Modelo Predictivo Tabular (Scikit-Learn / XGBoost) Desacoplado de la Capa Speed | **Aceptado** | 2026-10-26 |
 
 ---
 
@@ -162,3 +163,26 @@ El TL exigió tanto **OpenMetadata** como **Apache Atlas**. Sin embargo, configu
   * Ambas interfaces de gobernanza quedan 100% funcionales y pobladas con grafos visuales reales en los primeros minutos de la prueba.
   * Cero riesgo de incompatibilidad de librerías en Spark.
   * Demostración de dominio de automatización de metadatos mediante APIs estándar.
+
+---
+
+## ADR-008: Integración de Modelo Predictivo Tabular (Scikit-Learn / XGBoost) Desacoplado de la Capa Speed
+
+### Contexto
+Se requiere dotar al sistema de soporte analítico predictivo para anticipar el deterioro fisiológico de los pacientes en UCI (ej. riesgo de shock séptico o falla multiorgánica). Sin embargo, incorporar inferencia pesada (como LLMs o modelos de lenguaje) dentro del bucle de Spark Streaming generaría cuellos de botella por contrapresión (*backpressure*), latencias de varios segundos y obsolescencia del dato evaluado frente a la telemetría viva de alta frecuencia.
+
+### Decisión
+1. **Modelo Tabular de Machine Learning Ligero:** Implementar un clasificador tabular (Scikit-Learn / XGBoost) entrenado sobre el **Master Dataset en MinIO (Batch Layer)** que infiere a partir de vectores de características fisiológicas numéricas (FC, SpO2, PAS, PAD, PAM, Shock Index y deltas respecto a la línea base histórica).
+2. **Desacoplamiento Estricto:** La Capa Speed (Spark Streaming) se mantiene libre de inferencias pesadas síncronas, procesando exclusivamente a <40 ms las reglas críticas de reflejo médico y emisión WebSocket.
+3. **Inferencia Ultrarrápida (< 3 ms) en la Capa de Servicio:** El modelo se ejecuta de forma desacoplada en FastAPI bajo demanda (o precalculado en lotes por Airflow), consumiendo el snapshot consolidado en PostgreSQL (`vitals_realtime` + `vitals_historico`).
+
+### Estado
+**Aceptado.**
+
+### Consecuencias
+* **Positivas:**
+  * **Latencia de Inferencia < 3 ms:** El cálculo de probabilidad y categorización de riesgo se realiza en tiempo real sin impacto perceptible para el usuario ni bloqueo del servidor.
+  * **Cero Contrapresión en Streaming:** Spark Streaming y Kafka operan sin retrasos de CPU o dependencias de GPU.
+  * **Consumo Mínimo de Recursos:** La huella de memoria del modelo es inferior a 80 MB, garantizando estabilidad total en el clúster Docker Compose.
+  * **Explicabilidad Clínica:** Permite presentar al personal médico probabilidades directas, índices fisiológicos reconocidos internacionalmente (Shock Index) y deltas basales sin cajas negras impenetrables.
+* **Negativas / Mitigación:** Requiere que la Capa Batch mantenga actualizadas las tablas de basales históricos para poder calcular con precisión los deltas de variación fisiológica.

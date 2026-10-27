@@ -22,6 +22,7 @@ En las Unidades de Cuidados Intensivos (UCI) y salas de reanimación, la velocid
 │            PACIENTE            │       │         UBICACIÓN / CAMA       │
 ├────────────────────────────────┤       ├────────────────────────────────┤
 │ • patient_id: ID único clínico │◄─────►│ • bed_id: Código de cama UCI   │
+│ • clinic_id: Código de clínica │       │ • clinic_id: Red hospitalaria  │
 │ • admission_time: Ingreso UCI  │       │ • unit_id: Unidad (UCI-Adultos)│
 └────────────────────────────────┘       └────────────────────────────────┘
                  ▲                                       ▲
@@ -33,6 +34,9 @@ En las Unidades de Cuidados Intensivos (UCI) y salas de reanimación, la velocid
                  │       EVENTO DE SIGNOS VITALES │
                  ├────────────────────────────────┤
                  │ • event_id (UUID)              │
+                 │ • clinic_id (Sede hospitalaria)│
+                 │ • patient_id                   │
+                 │ • bed_id                       │
                  │ • timestamp (ISO-8601 UTC)     │
                  │ • heart_rate_bpm (lpm)         │
                  │ • spo2_percent (%)             │
@@ -144,3 +148,50 @@ El frontend opera bajo tres estados formales:
      }
      ```
    * La interfaz parpadea en rojo y sitúa al paciente al inicio de la lista de prioridad médica.
+
+---
+
+## 🤖 7. Modelo Predictivo Tabular de Deterioro Clínico (Scikit-Learn / XGBoost)
+
+Para apoyar al personal médico sin introducir latencias en el streaming de Spark, el sistema incorpora un clasificador tabular ultrarrápido (< 3 ms de inferencia) desacoplado en FastAPI.
+
+### A. Vector de Características (Features)
+El modelo procesa 8 variables numéricas obtenidas del cruce entre `vitals_realtime` y `vitals_historico`:
+
+1. **Frecuencia Cardíaca Actual (`heart_rate_bpm`):** Ritmo en el instante evaluado.
+2. **Saturación Actual (`spo2_percent`):** Nivel de oxigenación periférica.
+3. **Presión Sistólica Actual (`systolic_bp`):** Presión máxima arterial.
+4. **Presión Diastólica Actual (`diastolic_bp`):** Presión mínima arterial.
+5. **Frecuencia Respiratoria Actual (`respiratory_rate`):** Ventilación por minuto.
+6. **Presión Arterial Media (PAM / MAP):** Indicador clave de perfusión de órganos vitales:
+   $$\text{MAP} = \frac{2 \times \text{diastolic\_bp} + \text{systolic\_bp}}{3}$$
+7. **Índice de Shock (Shock Index - SI):** Marcador temprano de shock hemodinámico o hipovolemia:
+   $$\text{Shock Index} = \frac{\text{heart\_rate\_bpm}}{\text{systolic\_bp}}$$
+   *(Normal: 0.5 - 0.7; Alerta temprana: > 0.8; Shock severo: > 1.0)*
+8. **Delta de Frecuencia Cardíaca respecto al Basal 24h (`hr_delta_from_baseline`):**
+   $$\Delta \text{HR} = \text{heart\_rate\_bpm} - \text{baseline\_avg\_hr}$$
+
+### B. Contrato de Respuesta de la API (`POST /api/v1/clinical-assistant/evaluate`)
+```json
+{
+  "patient_id": "PAT-1082",
+  "clinic_id": "CLI-CENTRAL-01",
+  "bed_id": "UCI-BED-04",
+  "evaluation_timestamp": "2026-10-26T22:08:00.150Z",
+  "inference_latency_ms": 1.85,
+  "risk_score": 82.4,
+  "risk_level": "CRITICO",
+  "probabilities": {
+    "bajo": 0.03,
+    "moderado": 0.05,
+    "alto": 0.10,
+    "critico": 0.82
+  },
+  "clinical_factors": {
+    "mean_arterial_pressure": 65.0,
+    "shock_index": 1.58,
+    "hr_delta_from_baseline": 62.6
+  },
+  "recommendation": "Alerta de inestabilidad hemodinámica aguda y sospecha de shock (Shock Index: 1.58). Notificar de inmediato al médico intensivista."
+}
+```
