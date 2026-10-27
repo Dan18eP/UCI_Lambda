@@ -59,5 +59,16 @@ with DAG(
         }
     )
 
-    # Orden de ejecución estricto: Ingesta Inmutable -> Agregación Analítica
-    dump_kafka_to_minio_raw >> compute_historical_vitals
+    # Tarea 3: Emisión de linaje y metadatos hacia Apache Atlas y OpenMetadata (ADR-007)
+    register_governance_lineage = BashOperator(
+        task_id="register_governance_lineage",
+        bash_command="python /opt/airflow/scripts/register_atlas_lineage.py",
+        env={
+            "ATLAS_URL": "http://apache-atlas:21000/api/atlas/v2",
+            "ATLAS_USER": "admin",
+            "ATLAS_PASSWORD": "admin"
+        }
+    )
+
+    # Orden de ejecución estricto: Ingesta Inmutable -> Agregación Analítica -> Linaje & Gobernanza
+    dump_kafka_to_minio_raw >> compute_historical_vitals >> register_governance_lineage
